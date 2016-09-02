@@ -21,13 +21,16 @@ env.user = 'raja'
 @running.runs_once(marker='file_mutex_{time}'.format(time=TIME_STAMP))
 def db_migration():
     """This task runs only on one host even though it is decorated with `parallel`"""
-    run("bundle exec rake db:migrate")
+    run("echo 'Running migration'")
 
 @task
 @parallel
 @roles('application_servers')
 @running.runs_once(marker='file_mutex_{time}'.format(time=TIME_STAMP),
                     error_msg=red("Migration is already running in one host"))
-def db_migration():
-    """This task runs only on one host even though it is decorated with `parallel`"""
-    run("bundle exec rake db:migrate")
+def db_migration_with_error_msg():
+    """
+    This task runs on one host even though it is decorated with `parallel`
+    and prints the error message if attemted in other hosts.
+    """
+    run("echo 'Running migration'")
