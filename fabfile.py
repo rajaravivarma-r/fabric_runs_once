@@ -8,12 +8,17 @@ from fabric.colors import red
 
 TIME_STAMP = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
+# Replace this with your list of hosts.
 env.roledefs = {
     'application_servers':
         {'hosts': ['192.168.56.10{}'.format(i) for i in range(1, 6)]},
 }
 
+# Replace the value with your ssh user name
 env.user = 'raja'
+
+# If you are using `sudo` instead of `run`
+# env.sudo_user = 'application user'
 
 @task
 @parallel
@@ -26,8 +31,8 @@ def db_migration():
 @task
 @parallel
 @roles('application_servers')
-@running.runs_once(marker='file_mutex_{time}'.format(time=TIME_STAMP),
-                    error_msg=red("Migration is already running in one host"))
+@running.runs_once(marker='/tmp/file_mutex_{time}'.format(time=TIME_STAMP),
+                   error_msg=red("Migration is already running in one host"))
 def db_migration_with_error_msg():
     """
     This task runs on one host even though it is decorated with `parallel`
